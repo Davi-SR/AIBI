@@ -9,6 +9,6 @@ wheels/
 # Virtual environments
 .venv
 .env
-tmp
+/tmp
 knowledge.JSON
 project.toml
