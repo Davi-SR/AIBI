@@ -7,14 +7,14 @@ import os
 
 load_dotenv()
 
-# Carregando os arquivos de texto (o "cérebro" do agente)
+
 with open("knowledge.JSON", "r", encoding="utf-8") as f:
     db_context = f.read()
 
 with open("prompt.md", "r", encoding="utf-8") as f:
     instructions_prompt = f.read()
 
-# Função para gerar um agente fresco com estado de memória independente
+
 def get_agent():
     return Agent(
         tools=[SQLTools(db_url=os.getenv("DB_URL"))],
@@ -25,8 +25,8 @@ def get_agent():
             db_context
         ],
         markdown=True,
-        add_history_to_messages=True, # Adiciona memória no Phidata/Agno
-        num_history_responses=5 # Lembrará do contexto das últimas 5 interações
+        add_history_to_messages=True, 
+        num_history_responses=5 
     )
 
 agent = get_agent()
