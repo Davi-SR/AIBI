@@ -31,6 +31,6 @@ def get_agent():
 
 agent = get_agent()
 
-# Executando a pergunta localmente apenas se executado diretamente
+# Executando a pergunta localmente apenas se executado diretamente sem UI
 if __name__ == "__main__":
     agent.print_response("")
