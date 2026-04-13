@@ -1,0 +1,194 @@
+[
+  {
+    "table_name": "tb_UF",
+    "synonyms": ["estado", "uf", "unidade federativa", "região geográfica"],
+    "business_context": "Tabela de referência geográfica que representa os estados do Brasil e suas respectivas regiões. Usada para padronizar localização de clientes, empresas e vendedores.",
+    "columns": [
+      {"name": "id_uf", "meaning": "Identificador único do estado"},
+      {"name": "ds_regiao", "meaning": "Região geográfica do estado (ex: Sudeste, Sul, Nordeste)"},
+      {"name": "sigla", "meaning": "Sigla oficial do estado (ex: SP, RJ)"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_associado via tb_associado.id_UF_a = tb_UF.id_uf",
+      "Relaciona-se com tb_empresa via tb_empresa.id_UF_e = tb_UF.id_uf",
+      "Relaciona-se com tb_funcionario via tb_funcionario.id_uf_f = tb_UF.id_uf"
+    ]
+  },
+  {
+    "table_name": "tb_corretora",
+    "synonyms": ["corretora", "parceiro comercial", "empresa de vendas", "canal de vendas"],
+    "business_context": "Representa as corretoras parceiras responsáveis pela intermediação e venda de produtos da empresa.",
+    "columns": [
+      {"name": "id_corretora", "meaning": "Identificador único da corretora"},
+      {"name": "nm_razao_social", "meaning": "Nome jurídico da corretora"},
+      {"name": "nu_cnpj", "meaning": "CNPJ da corretora"},
+      {"name": "nu_status", "meaning": "Status da corretora", "values_context": "0 = Inativa, 1 = Ativa"},
+      {"name": "tx_UF", "meaning": "Estado onde a corretora está localizada"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_vendedor via tb_vendedor.id_Corretorav = tb_corretora.id_corretora"
+    ]
+  },
+  {
+    "table_name": "tb_vendedor",
+    "synonyms": ["vendedor", "consultor", "representante", "corretor"],
+    "business_context": "Representa os profissionais responsáveis pela venda dos produtos aos clientes finais (pessoa física ou empresas).",
+    "columns": [
+      {"name": "id_vendedor", "meaning": "Identificador único do vendedor"},
+      {"name": "tx_nome", "meaning": "Nome do vendedor"},
+      {"name": "nu_cpf", "meaning": "CPF do vendedor"},
+      {"name": "ds_email", "meaning": "Email de contato do vendedor"},
+      {"name": "en_status", "meaning": "Status do vendedor", "values_context": "ativo = em operação, inativo = desligado"},
+      {"name": "bl_ativo", "meaning": "Flag numérica de ativo", "values_context": "1 = ativo, 0 = inativo"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_corretora via tb_vendedor.id_Corretorav = tb_corretora.id_corretora",
+      "Relaciona-se com tb_associado via tb_associado.id_vendedor_a = tb_vendedor.id_vendedor",
+      "Relaciona-se com tb_empresa via tb_empresa.id_vendedor_e = tb_vendedor.id_vendedor"
+    ]
+  },
+  {
+    "table_name": "tb_ProdutoComercial",
+    "synonyms": ["produto", "plano", "plano odontológico", "produto comercial"],
+    "business_context": "Define os produtos/plans comercializados pela empresa, incluindo regras comerciais, categorias e configurações de venda.",
+    "columns": [
+      {"name": "id_prodcomerc", "meaning": "Identificador do produto"},
+      {"name": "nm_prodcomerc", "meaning": "Nome do produto comercial"},
+      {"name": "en_status", "meaning": "Status do produto", "values_context": "0 = inativo, 1 = ativo"},
+      {"name": "nu_PublicaInt", "meaning": "Indica se o produto é público ou interno", "values_context": "0 = interno, 1 = público"},
+      {"name": "en_SitCarencia", "meaning": "Indica se possui carência", "values_context": "0 = sem carência, 1 = com carência"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_empresa via tb_empresa.id_prodcomerc_e = tb_ProdutoComercial.id_prodcomerc",
+      "Relaciona-se com tb_associado via tb_associado.id_prodcomerc_a = tb_ProdutoComercial.id_prodcomerc",
+      "Relaciona-se com tb_funcionario via tb_funcionario.id_prodcomerc_f = tb_ProdutoComercial.id_prodcomerc"
+    ]
+  },
+  {
+    "table_name": "tb_associado",
+    "synonyms": ["cliente", "beneficiário", "associado", "pessoa física"],
+    "business_context": "Representa os clientes individuais (pessoa física) que contrataram um plano odontológico.",
+    "columns": [
+      {"name": "id_associado", "meaning": "Identificador único do cliente"},
+      {"name": "nm_associado", "meaning": "Nome do cliente"},
+      {"name": "nu_cpf", "meaning": "CPF do cliente"},
+      {"name": "dt_nasc", "meaning": "Data de nascimento do cliente"},
+      {"name": "nu_vl_mensalidade", "meaning": "Valor mensal pago pelo cliente"},
+      {"name": "dt_inicio_vigencia", "meaning": "Data de início do contrato (usar como filtro padrão de período)"},
+      {"name": "cd_status", "meaning": "Status do contrato", "values_context": "0 = inativo/cancelado, 1 = ativo"},
+      {"name": "dt_Cadastro", "meaning": "Data de cadastro do cliente (usar como filtro alternativo de período)"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_vendedor via tb_associado.id_vendedor_a = tb_vendedor.id_vendedor",
+      "Relaciona-se com tb_UF via tb_associado.id_UF_a = tb_UF.id_uf",
+      "Relaciona-se com tb_ProdutoComercial via tb_associado.id_prodcomerc_a = tb_ProdutoComercial.id_prodcomerc"
+    ]
+  },
+  {
+    "table_name": "tb_empresa",
+    "synonyms": ["empresa", "cliente empresa", "cliente PJ", "contrato empresarial"],
+    "business_context": "Representa empresas clientes que contratam planos odontológicos para seus funcionários.",
+    "columns": [
+      {"name": "id_cdempresa", "meaning": "Identificador da empresa"},
+      {"name": "nm_razao_social", "meaning": "Razão social da empresa"},
+      {"name": "nm_nome_fantasia", "meaning": "Nome fantasia da empresa"},
+      {"name": "nu_cnpj", "meaning": "CNPJ da empresa"},
+      {"name": "nu_qtd_funcionarios", "meaning": "Quantidade de funcionários"},
+      {"name": "nu_vl_mensalidade", "meaning": "Valor mensal do contrato"},
+      {"name": "DT_CADASTRO", "meaning": "Data de cadastro da empresa (usar como filtro padrão de período)"},
+      {"name": "cd_status", "meaning": "Status do contrato da empresa"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_vendedor via tb_empresa.id_vendedor_e = tb_vendedor.id_vendedor",
+      "Relaciona-se com tb_ProdutoComercial via tb_empresa.id_prodcomerc_e = tb_ProdutoComercial.id_prodcomerc",
+      "Relaciona-se com tb_UF via tb_empresa.id_UF_e = tb_UF.id_uf",
+      "Relaciona-se com tb_funcionario via tb_funcionario.id_cdempresa_f = tb_empresa.id_cdempresa",
+      "Relaciona-se com tb_pgtoboletoemp via tb_pgtoboletoemp.id_cdempresa_pbe = tb_empresa.id_cdempresa"
+    ]
+  },
+  {
+    "table_name": "tb_funcionario",
+    "synonyms": ["funcionário", "beneficiário empresa", "colaborador", "dependente"],
+    "business_context": "Representa os funcionários vinculados a empresas clientes que usufruem do plano odontológico.",
+    "columns": [
+      {"name": "id_funcionario", "meaning": "Identificador do funcionário"},
+      {"name": "nm_funcionario", "meaning": "Nome do funcionário"},
+      {"name": "nu_cpf", "meaning": "CPF do funcionário"},
+      {"name": "dt_nascimento", "meaning": "Data de nascimento"},
+      {"name": "DT_CADASTRO", "meaning": "Data de cadastro (usar como filtro padrão de período)"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_empresa via tb_funcionario.id_cdempresa_f = tb_empresa.id_cdempresa",
+      "Relaciona-se com tb_UF via tb_funcionario.id_uf_f = tb_UF.id_uf",
+      "Relaciona-se com tb_ProdutoComercial via tb_funcionario.id_prodcomerc_f = tb_ProdutoComercial.id_prodcomerc"
+    ]
+  },
+  {
+    "table_name": "tb_pgtoboletoemp",
+    "synonyms": ["pagamento", "boleto", "fatura", "cobrança"],
+    "business_context": "Armazena informações de cobrança e pagamento de boletos das empresas clientes.",
+    "columns": [
+      {"name": "id_pagtoboleto_pbe", "meaning": "Identificador do boleto"},
+      {"name": "nu_valoremissao_pbe", "meaning": "Valor original do boleto"},
+      {"name": "dt_vencimento_pbe", "meaning": "Data de vencimento do boleto (usar como filtro padrão de período)"},
+      {"name": "dt_pagamento_pbe", "meaning": "Data em que o boleto foi pago"},
+      {"name": "vl_valorpago_pbe", "meaning": "Valor efetivamente pago"},
+      {"name": "nu_statusboleto_pbe", "meaning": "Status do boleto"}
+    ],
+    "joins_and_relationships": [
+      "Relaciona-se com tb_empresa via tb_pgtoboletoemp.id_cdempresa_pbe = tb_empresa.id_cdempresa"
+    ]
+  },
+  {
+  "table_name": "tb_ProdAnsS4E",
+  "synonyms": ["produto ans", "registro ans", "produto regulatório", "plano ans", "cadastro ans"],
+  "business_context": "Tabela de referência regulatória que contém os produtos cadastrados junto à ANS (Agência Nacional de Saúde Suplementar). Serve como base oficial para validação e classificação dos produtos comercializados pela empresa.",
+  "columns": [
+    {
+      "name": "id_ProdutoS4E",
+      "meaning": "Identificador interno do produto no sistema S4E"
+    },
+    {
+      "name": "id_AbrangAnsS4E_p",
+      "meaning": "Código que define o tipo de abrangência geográfica do produto ANS"
+    },
+    {
+      "name": "nu_CodProdutoS4E",
+      "meaning": "Código do produto no sistema S4E"
+    },
+    {
+      "name": "nm_NomeProdS4E",
+      "meaning": "Nome do produto no sistema interno S4E"
+    },
+    {
+      "name": "nu_CodClassAnsS4E",
+      "meaning": "Código da classificação ANS do produto"
+    },
+    {
+      "name": "nu_CodigoAnsS4E",
+      "meaning": "Código oficial do produto na ANS (registro regulatório)"
+    },
+    {
+      "name": "nm_NomeProdANS",
+      "meaning": "Nome oficial do produto conforme registrado na ANS"
+    },
+    {
+      "name": "nu_CodClassTpEmp",
+      "meaning": "Código do tipo de contratação empresarial",
+      "values_context": "Define o tipo de empresa/contrato vinculado ao produto (ex: PME, coletivo por adesão, empresarial)"
+    },
+    {
+      "name": "nm_DscClassTpEmp",
+      "meaning": "Descrição do tipo de contratação empresarial do produto, se o produto é individual/familiar, coletivo empresarial ou coletivo por adesão"
+    },
+    {
+      "name": "tx_UFsAbrangencia",
+      "meaning": "Lista de estados (UFs) onde o produto possui cobertura/abrangência geográfica"
+    }
+  ],
+  "joins_and_relationships": [
+    "Relaciona-se com tb_ProdutoComercial via tb_ProdutoComercial.id_ProdutoS4E_c = tb_ProdAnsS4E.id_ProdutoS4E",
+    "Essa relação permite mapear um produto comercial vendido ao seu correspondente regulatório na ANS"
+  ]
+}
+]

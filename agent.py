@@ -1,19 +1,36 @@
+import json
 from agno.agent import Agent
 from agno.tools.sql import SQLTools
-from agno.models.groq import Groq
+from agno.models.openai import OpenAIChat
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
-db_url = os.getenv("DB_URL")
+# Carregando os arquivos de texto (o "cérebro" do agente)
+with open("knowledge.JSON", "r", encoding="utf-8") as f:
+    db_context = f.read()
 
 with open("prompt.md", "r", encoding="utf-8") as f:
-    prompt = f.read()
+    instructions_prompt = f.read()
 
-agent = Agent(tools=[SQLTools(db_url=db_url)],
-        instructions=[prompt],
-        model=Groq(id="llama-3.3-70b-versatile"),
+# Função para gerar um agente fresco com estado de memória independente
+def get_agent():
+    return Agent(
+        tools=[SQLTools(db_url=os.getenv("DB_URL"))],
+        model=OpenAIChat(id="gpt-4o", api_key=os.getenv("OPENAI_API_KEY")),
+        instructions=[
+            instructions_prompt,
+            "\n### DICIONÁRIO DE DADOS (CONTEXTO DO BANCO):",
+            db_context
+        ],
         markdown=True,
-        add_history_to_context=True
+        add_history_to_messages=True, # Adiciona memória no Phidata/Agno
+        num_history_responses=5 # Lembrará do contexto das últimas 5 interações
     )
-agent.run()
+
+agent = get_agent()
+
+# Executando a pergunta localmente apenas se executado diretamente
+if __name__ == "__main__":
+    agent.print_response("")
