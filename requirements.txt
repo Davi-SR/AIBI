@@ -1,0 +1,14 @@
+# Dependências Core
+agno>=0.1.0
+fastapi>=0.100.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# Dependencias do Dashboard (Front-end)
+streamlit>=1.30.0
+pandas>=2.0.0
+plotly>=5.18.0
+
+# Ferramentas auxiliares de banco e runtime
+sqlalchemy>=2.0.0
+uvicorn>=0.23.0
