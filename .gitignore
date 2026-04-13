@@ -9,3 +9,7 @@ wheels/
 # Virtual environments
 .venv
 .env
+tmp
+knowledge.JSON
+project.toml
+.gitignore
